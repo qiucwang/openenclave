@@ -11,8 +11,8 @@
 // Public key of Intel's root certificate.
 static const char* _trusted_root_key_pem =
     "-----BEGIN PUBLIC KEY-----\n"
-    "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEC6nEwMDIYZOj/iPWsCzaEKi71OiO\n"
-    "SLRFhWGjbnBVJfVnkY4u3IjkDYYL0MxO4mqsyYjlBalTVYxFP2sJBK5zlA==\n"
+    "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAET/oP/VYc2tbA+Y0wjIEoxbknonMy\n"
+    "yOjrE/a+QrVx1kZvU8ZE/8L/wQKCIOSaSWbPAvMuL7TTSbssuu0okDegLQ==\n"
     "-----END PUBLIC KEY-----\n";
 
 OE_INLINE uint8_t _is_space(uint8_t c)

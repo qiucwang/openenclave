@@ -28,8 +28,8 @@
 // Public key of Intel's root certificate.
 static const char* g_expected_root_certificate_key =
     "-----BEGIN PUBLIC KEY-----\n"
-    "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEC6nEwMDIYZOj/iPWsCzaEKi71OiO\n"
-    "SLRFhWGjbnBVJfVnkY4u3IjkDYYL0MxO4mqsyYjlBalTVYxFP2sJBK5zlA==\n"
+    "MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAET/oP/VYc2tbA+Y0wjIEoxbknonMy\n"
+    "yOjrE/a+QrVx1kZvU8ZE/8L/wQKCIOSaSWbPAvMuL7TTSbssuu0okDegLQ==\n"
     "-----END PUBLIC KEY-----\n";
 
 static const oe_uuid_t _ecdsa_uuid = {OE_FORMAT_UUID_SGX_ECDSA};
