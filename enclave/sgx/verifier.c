@@ -349,6 +349,11 @@ done:
     return result;
 }
 
+void get_tick_count(uint32_t* tc)
+{
+    get_tick_count_ocall(tc);
+}
+
 oe_result_t sgx_verify_quote(
     const oe_uuid_t* format_id,
     const void* opt_params,

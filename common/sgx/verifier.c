@@ -671,6 +671,10 @@ oe_result_t oe_sgx_verify_evidence(
     size_t custom_claims_buffer_size = 0;
     oe_uuid_t* format_id = NULL;
 
+    uint32_t t0;
+    uint32_t t1;
+
+    get_tick_count(&t0);
     if (!context || !evidence_buffer || !evidence_buffer_size ||
         (!endorsements_buffer != !endorsements_buffer_size) ||
         (!claims != !claims_length))
@@ -845,7 +849,8 @@ oe_result_t oe_sgx_verify_evidence(
 done:
     if (local_endorsements_buffer)
         oe_free_sgx_endorsements(local_endorsements_buffer);
-
+    get_tick_count(&t1);
+    OE_TRACE_INFO("oe_sgx_verify_evidence takes: %lu ms\n", t1 - t0);
     return result;
 }
 

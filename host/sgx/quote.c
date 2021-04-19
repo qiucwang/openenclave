@@ -13,6 +13,26 @@
 #include "sgxquote.h"
 #include "sgxquoteprovider.h"
 
+#if defined(_WIN32)
+#include <Windows.h>
+void get_tick_count(uint32_t* tc)
+{
+    *tc = GetTickCount();
+}
+#else
+#include <time.h>
+#include <unistd.h>
+void get_tick_count(uint32_t* tc)
+{
+    struct timespec ts;
+    uint32_t t = 0U;
+    clock_gettime(CLOCK_REALTIME, &ts);
+    t = (unsigned)(ts.tv_nsec / 1000000);
+    t += (unsigned)(ts.tv_sec * 1000);
+    *tc = t;
+}
+#endif
+
 oe_result_t sgx_get_qetarget_info(
     const oe_uuid_t* format_id,
     const void* opt_params,

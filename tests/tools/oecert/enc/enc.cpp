@@ -3,6 +3,7 @@
 
 #include <openenclave/attestation/attester.h>
 #include <openenclave/attestation/sgx/evidence.h>
+#include <openenclave/attestation/verifier.h>
 #include <openenclave/edger8r/enclave.h>
 #include <openenclave/enclave.h>
 #include <openenclave/internal/raise.h>
@@ -128,6 +129,8 @@ oe_result_t get_plugin_evidence(
     size_t local_evidence_size = 0;
     uint8_t* local_endorsements = NULL;
     size_t local_endorsements_size = 0;
+    oe_claim_t* claims = NULL;
+    size_t claims_length = 0;
 
     static const oe_uuid_t _ecdsa_uuid = {OE_FORMAT_UUID_SGX_ECDSA};
 
@@ -162,6 +165,30 @@ oe_result_t get_plugin_evidence(
     }
 
     OE_CHECK(oe_attester_shutdown());
+
+    printf("========== Verifying OE evidence\n");
+
+    OE_CHECK(oe_verifier_initialize());
+
+    OE_CHECK_MSG(
+        oe_verify_evidence(
+            NULL,
+            local_evidence,
+            local_evidence_size,
+            endorsements,
+            endorsements_size,
+            NULL,
+            0,
+            &claims,
+            &claims_length),
+        "Failed to verify evidence. result=%u (%s)\n",
+        result,
+        oe_result_str(result));
+
+    printf("========== OE evidence verified.\n\n");
+
+    OE_CHECK(oe_free_claims(claims, claims_length));
+    OE_CHECK(oe_verifier_shutdown());
 
     result = OE_OK;
 

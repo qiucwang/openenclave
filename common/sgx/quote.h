@@ -14,6 +14,11 @@
 OE_EXTERNC_BEGIN
 
 /*!
+ * @param[out] tc Pointer to the tick count in millisecond
+ */
+void get_tick_count(uint32_t* tc);
+
+/*!
  * Retrieves certifate chain from the quote.
  *
  * Caller is responsible for deallocating memory in pck_cert_chain.

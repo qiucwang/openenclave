@@ -254,6 +254,11 @@ done:
     return result;
 }
 
+void get_tick_count_ocall(uint32_t* tc_out)
+{
+    get_tick_count(tc_out);
+}
+
 oe_result_t oe_get_qetarget_info_ocall(
     const oe_uuid_t* format_id,
     const void* opt_params,

@@ -45,6 +45,10 @@ enclave
 
     untrusted
     {
+        void get_tick_count_ocall(
+            [out] uint32_t* tc_out
+        );
+
         // Input and output size values in number of bytes,
         //    not number of UUIDs
         // If format_ids buffer is NULL or too small,

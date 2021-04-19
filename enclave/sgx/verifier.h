@@ -16,6 +16,8 @@ typedef struct _sgx_ql_qe_report_info_t
 } sgx_ql_qe_report_info_t;
 #endif
 
+void get_tick_count(uint32_t* tc);
+
 oe_result_t oe_verify_qve_report_and_identity(
     const uint8_t* p_quote,
     uint32_t quote_size,
