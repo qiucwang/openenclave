@@ -17,6 +17,8 @@
 #include "quote.h"
 #include "report.h"
 
+#include <stdio.h>
+
 #if !defined(OE_BUILD_ENCLAVE)
 #include "../../host/sgx/sgxquoteprovider.h"
 #endif
@@ -850,7 +852,7 @@ done:
     if (local_endorsements_buffer)
         oe_free_sgx_endorsements(local_endorsements_buffer);
     get_tick_count(&t1);
-    OE_TRACE_INFO("oe_sgx_verify_evidence takes: %lu ms\n", t1 - t0);
+    printf("oe_sgx_verify_evidence takes: %lu ms\n", t1 - t0);
     return result;
 }
 
