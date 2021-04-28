@@ -790,6 +790,7 @@ oe_result_t oe_sgx_verify_evidence(
         }
 
         // Get the endorsements if none were provided.
+        get_tick_count(&t2);
         if (endorsements_buffer == NULL)
         {
             OE_CHECK(oe_get_sgx_endorsements(
@@ -800,7 +801,8 @@ oe_result_t oe_sgx_verify_evidence(
             endorsements_buffer = local_endorsements_buffer;
             endorsements_buffer_size = local_endorsements_buffer_size;
         }
-
+        get_tick_count(&t3);
+        printf("oe_get_sgx_endorsements takes: %u ms\n", t3 - t2);
         // Parse into SGX endorsements.
         OE_CHECK(oe_parse_sgx_endorsements(
             (oe_endorsements_t*)endorsements_buffer,

@@ -211,9 +211,12 @@ oe_result_t oe_get_sgx_quote_verification_collateral_from_certs(
     oe_result_t result = OE_FAILURE;
     ParsedExtensionInfo parsed_extension_info = {{0}};
 
+    uint32_t t0;
+    uint32_t t1;
+    get_tick_count(&t0);
+
     if (leaf_cert == NULL)
         OE_RAISE(OE_INVALID_PARAMETER);
-
     // Gather fmspc.
     OE_CHECK(_parse_sgx_extensions(leaf_cert, &parsed_extension_info));
     OE_CHECK(oe_memcpy_s(
@@ -229,7 +232,10 @@ oe_result_t oe_get_sgx_quote_verification_collateral_from_certs(
 
     result = OE_OK;
 done:
-
+    get_tick_count(&t1);
+    printf(
+        "oe_get_sgx_quote_verification_collateral_from_certs takes: %u ms\n",
+        t1 - t0);
     return result;
 }
 

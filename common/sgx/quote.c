@@ -416,7 +416,7 @@ oe_result_t oe_get_quote_cert_chain_internal(
     // Read and validate the chain.
     OE_CHECK(oe_cert_chain_read_pem(
         pck_cert_chain, *pem_pck_certificate, *pem_pck_certificate_size));
-
+    printf("pem_pck_certificate:\n%s\n", *pem_pck_certificate);
     result = OE_OK;
 done:
 
