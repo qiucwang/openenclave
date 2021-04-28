@@ -16,6 +16,7 @@
 #include "endorsements.h"
 #include "qeidentity.h"
 
+#include <stdio.h>
 #include <time.h>
 
 #ifdef OE_BUILD_ENCLAVE
@@ -517,6 +518,9 @@ oe_result_t oe_verify_quote_with_sgx_endorsements(
     uint32_t supplemental_data_size_out = 0;
     time_t expiration_check_date;
 
+    uint32_t t0;
+    uint32_t t1;
+
     // Verify quote/endorsements for the given time.  Use endorsements
     // creation time if one was not provided.
     if (input_validation_time == NULL)
@@ -607,12 +611,16 @@ oe_result_t oe_verify_quote_with_sgx_endorsements(
     // DCAP QVL doesn't exist or system env `SGX_DCAP_QVL` doesn't set
     if (result == OE_PLATFORM_ERROR)
     {
+        get_tick_count(&t0);
         OE_CHECK_MSG(
             oe_verify_quote_internal(quote, quote_size),
             "Failed to verify remote quote.",
             NULL);
+        get_tick_count(&t1);
+        printf("oe_verify_quote_internal takes: %u ms\n", t1 - t0);
     }
 
+    get_tick_count(&t0);
     OE_CHECK_MSG(
         oe_get_sgx_quote_validity(
             quote,
@@ -622,6 +630,8 @@ oe_result_t oe_verify_quote_with_sgx_endorsements(
             &validity_until),
         "Failed to validate quote. %s",
         oe_result_str(result));
+    get_tick_count(&t1);
+    printf("oe_get_sgx_quote_validity takes: %u ms\n", t1 - t0);
 
     if (oe_datetime_compare(&validation_time, &validity_from) < 0)
     {
@@ -696,6 +706,9 @@ oe_result_t oe_get_sgx_quote_validity(
     oe_datetime_t from;
     oe_datetime_t until;
 
+    uint32_t t0;
+    uint32_t t1;
+
     if ((quote == NULL) || (sgx_endorsements == NULL) || (valid_from == NULL) ||
         (valid_until == NULL))
         OE_RAISE(OE_INVALID_PARAMETER);
@@ -716,6 +729,7 @@ oe_result_t oe_get_sgx_quote_validity(
     pem_pck_certificate = qe_cert_data.data;
     pem_pck_certificate_size = qe_cert_data.size;
 
+    get_tick_count(&t0);
     OE_CHECK_MSG(
         oe_get_quote_cert_chain_internal(
             quote,
@@ -726,6 +740,8 @@ oe_result_t oe_get_sgx_quote_validity(
         "Failed to retreive PCK cert chain. %s",
         oe_result_str(result));
 
+    get_tick_count(&t1);
+    printf("oe_get_quote_cert_chain_internal takes: %u ms\n", t1 - t0);
     // Fetch certificates.
     OE_CHECK_MSG(
         oe_cert_chain_get_leaf_cert(&pck_cert_chain, &pck_cert),
@@ -758,20 +774,29 @@ oe_result_t oe_get_sgx_quote_validity(
     _update_validity(&latest_from, &earliest_until, &from, &until);
 
     // Fetch revocation info validity dates.
+
+    get_tick_count(&t0);
     OE_CHECK_MSG(
         oe_validate_revocation_list(&pck_cert, sgx_endorsements, &from, &until),
 
         "Failed to validate revocation info. %s",
         oe_result_str(result));
+    get_tick_count(&t1);
+    printf("oe_validate_revocation_list takes: %u ms\n", t1 - t0);
+
     _update_validity(&latest_from, &earliest_until, &from, &until);
 
     // QE identity info validity dates.
+    get_tick_count(&t0);
     OE_CHECK_MSG(
         oe_validate_qe_identity(
             &quote_auth_data->qe_report_body, sgx_endorsements, &from, &until),
 
         "Failed quoting enclave identity checking. %s",
         oe_result_str(result));
+
+    get_tick_count(&t1);
+    printf("oe_validate_qe_identity takes: %u ms\n", t1 - t0);
     _update_validity(&latest_from, &earliest_until, &from, &until);
 
     oe_datetime_log("Quote overall issue date: ", &latest_from);

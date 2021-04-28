@@ -9,6 +9,9 @@
 #include <string.h>
 #include "pem.h"
 
+#include <stdio.h>
+#include "../../sgx/verifier.h"
+
 typedef oe_result_t (*oe_copy_key)(
     mbedtls_pk_context* dest,
     const mbedtls_pk_context* src,
@@ -412,12 +415,17 @@ oe_result_t oe_public_key_verify(
     mbedtls_md_type_t type = _map_hash_type(hash_type);
     int rc = 0;
 
+    uint32_t t0;
+    uint32_t t1;
+
     /* Check for null parameters */
     if (!oe_public_key_is_valid(public_key, magic) || !hash_data ||
         !hash_size || !signature || !signature_size)
         OE_RAISE(OE_INVALID_PARAMETER);
 
     /* Verify the signature */
+    get_tick_count(&t0);
+
     rc = mbedtls_pk_verify(
         (mbedtls_pk_context*)&public_key->pk,
         type,
@@ -425,6 +433,8 @@ oe_result_t oe_public_key_verify(
         hash_size,
         signature,
         signature_size);
+    get_tick_count(&t1);
+    printf("mbedtls_pk_verify takes: %u ms\n", t1 - t0);
     if (rc != 0)
         OE_RAISE_MSG(OE_VERIFY_FAILED, "rc = 0x%x", rc * (-1));
 

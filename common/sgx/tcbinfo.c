@@ -8,6 +8,9 @@
 #include <openenclave/internal/utils.h>
 #include "../common.h"
 
+#include <stdio.h>
+#include "quote.h"
+
 // Public key of Intel's root certificate.
 static const char* _trusted_root_key_pem =
     "-----BEGIN PUBLIC KEY-----\n"
@@ -1311,6 +1314,9 @@ static oe_result_t _ecdsa_verify(
     uint8_t asn1Signature[256];
     size_t asn1SignatureSize = sizeof(asn1Signature);
 
+    uint32_t t0;
+    uint32_t t1;
+
     OE_CHECK(oe_sha256_init(&sha256Ctx));
     OE_CHECK(oe_sha256_update(&sha256Ctx, data, dataSize));
     OE_CHECK(oe_sha256_final(&sha256Ctx, &sha256));
@@ -1323,6 +1329,7 @@ static oe_result_t _ecdsa_verify(
         signature->s,
         sizeof(signature->s)));
 
+    get_tick_count(&t0);
     OE_CHECK(oe_ec_public_key_verify(
         publicKey,
         OE_HASH_TYPE_SHA256,
@@ -1330,7 +1337,8 @@ static oe_result_t _ecdsa_verify(
         sizeof(sha256),
         asn1Signature,
         asn1SignatureSize));
-
+    get_tick_count(&t1);
+    printf("oe_ec_public_key_verify takes: %u ms\n", t1 - t0);
     result = OE_OK;
 done:
     return result;

@@ -20,7 +20,9 @@
 #include <openenclave/internal/safecrt.h>
 #include <openenclave/internal/trace.h>
 #include <openenclave/internal/utils.h>
+#include <stdio.h>
 #include <string.h>
+#include "../../sgx/verifier.h"
 #include "crl.h"
 #include "ctr_drbg.h"
 #include "ec.h"
@@ -334,10 +336,17 @@ static oe_result_t _mbedtls_x509_crt_verify(
 {
     oe_result_t result = OE_UNEXPECTED;
     uint32_t flags = 0;
+
+    uint32_t t0;
+    uint32_t t1;
+
+    get_tick_count(&t0);
+
     if (mbedtls_x509_crt_verify(
             leaf_cert, ca_cert_chain, ca_crls, NULL, &flags, NULL, NULL) != 0)
     {
         char error[1024] = {0};
+        get_tick_count(&t0);
         mbedtls_x509_crt_verify_info(error, sizeof(error), "", flags);
         if (flags & MBEDTLS_X509_BADCERT_REVOKED)
             result = OE_VERIFY_REVOKED;
@@ -352,7 +361,8 @@ static oe_result_t _mbedtls_x509_crt_verify(
             error,
             flags);
     }
-
+    get_tick_count(&t1);
+    printf("_mbedtls_x509_crt_verify takes: %u ms\n", t1 - t0);
     result = OE_OK;
 
 done:
@@ -733,6 +743,11 @@ oe_result_t oe_cert_chain_read_pem(
     uint8_t* tmp_pem_data = (uint8_t*)pem_data;
     size_t tmp_pem_size = pem_size;
 
+    uint32_t t0;
+    uint32_t t1;
+
+    get_tick_count(&t0);
+
     /* Clear the implementation (making it invalid) */
     if (impl)
         memset(impl, 0, sizeof(CertChain));
@@ -786,6 +801,10 @@ done:
         oe_free(tmp_pem_data);
 
     _referent_free(referent);
+
+    get_tick_count(&t1);
+    printf("oe_cert_read_pem takes: %u ms\n", t1 - t0);
+
     return result;
 }
 
@@ -820,6 +839,11 @@ oe_result_t oe_cert_verify(
     Cert* cert_impl = (Cert*)cert;
     CertChain* chain_impl = (CertChain*)chain;
     mbedtls_x509_crl* crl_list = NULL;
+
+    uint32_t t0;
+    uint32_t t1;
+
+    get_tick_count(&t0);
 
     /* Reject invalid certificate */
     if (!_cert_is_valid(cert_impl))
@@ -899,7 +923,8 @@ oe_result_t oe_cert_verify(
         }
     }
     result = OE_OK;
-
+    get_tick_count(&t1);
+    printf("oe_cert_verify takes: %u ms\n", t1 - t0);
 done:
 
     if (crl_list)

@@ -675,6 +675,8 @@ oe_result_t oe_sgx_verify_evidence(
 
     uint32_t t0;
     uint32_t t1;
+    uint32_t t2;
+    uint32_t t3;
 
     get_tick_count(&t0);
     if (!context || !evidence_buffer || !evidence_buffer_size ||
@@ -804,7 +806,7 @@ oe_result_t oe_sgx_verify_evidence(
             (oe_endorsements_t*)endorsements_buffer,
             endorsements_buffer_size,
             &sgx_endorsements));
-
+        get_tick_count(&t2);
         // Verify the quote now.
         OE_CHECK(oe_verify_quote_with_sgx_endorsements(
             report_body,
@@ -813,6 +815,8 @@ oe_result_t oe_sgx_verify_evidence(
             time,
             &valid_from,
             &valid_until));
+        get_tick_count(&t3);
+        printf("oe_verify_quote_with_sgx_endorsements takes: %u ms\n", t3 - t2);
     }
 
     // Last step is to return the required and custom claims.
@@ -852,7 +856,7 @@ done:
     if (local_endorsements_buffer)
         oe_free_sgx_endorsements(local_endorsements_buffer);
     get_tick_count(&t1);
-    printf("oe_sgx_verify_evidence takes: %lu ms\n", t1 - t0);
+    printf("oe_sgx_verify_evidence takes: %u ms\n", t1 - t0);
     return result;
 }
 

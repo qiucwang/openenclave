@@ -19,7 +19,9 @@
 #include <openenclave/internal/thread.h>
 #include <openenclave/internal/trace.h>
 #include <openenclave/internal/utils.h>
+#include <stdio.h>
 #include "../common.h"
+#include "quote.h"
 #include "tcbinfo.h"
 
 // Defaults to Intel SGX 1.8 Release Date.
