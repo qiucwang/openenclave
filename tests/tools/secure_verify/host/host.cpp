@@ -17,6 +17,7 @@
 #include <unistd.h>
 #elif defined(_WIN32)
 #include <windows.h>
+#define strcasecmp _stricmp
 #endif
 #include "secure_verify_u.h"
 
